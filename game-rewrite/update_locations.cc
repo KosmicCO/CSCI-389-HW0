@@ -1,14 +1,13 @@
-#pragma once
 
 #include <random>
 #include <time.h>
 
 typedef int unit;
 
-void generate_random_list(unit * arr, int size, const unit bound, std::mt19937 * seed_gen) {
-    std::uniform_int_distribution<> dist(-bound, bound);
+void generate_random_list(unit * arr, int size, const unit bound, std::default_random_engine * seed_gen) {
+    std::uniform_int_distribution<unit> dist(-bound, bound);
     for (auto i = 0; i < size; i++) {
-        arr[i] = dist(seed_gen);
+        arr[i] = dist(*seed_gen);
     }
 }
 
@@ -26,10 +25,10 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    auto size = std::stoi(argv[0]);
-    auto iters = std::stoi(argv[1]);
-    std::hash<int> hash_int;
-    std::mt19937 gen(hash_int(size));
+    int size = std::stoi(argv[1]);
+    int iters = std::stoi(argv[2]);
+    std::default_random_engine gen(size);
+    //std::mt19937 gen(size);
 
     unit** pos = new unit*[3];
     unit** vec = new unit*[3];
@@ -54,8 +53,8 @@ int main(int argc, char** argv) {
     for(auto i = 0; i < 3; i++) {
         checksum = std::accumulate(pos[0], pos[0] + size, checksum);
     }
-    printf("Mean time per coordinate: %f", (1000000. * t_start.tv_nsec / (size * iters)));
-    printf("Final checksum is: %d", checksum);
+    printf("Mean time per coordinate: %F\n", static_cast<double>((t_end.tv_nsec - t_start.tv_nsec) / (size * iters * 1.)));
+    printf("Final checksum is: %d\n", checksum);
 
 
     for(auto i = 0; i < 3; i++) {
